@@ -9,6 +9,7 @@ server.use(restify.acceptParser(server.acceptable));
 server.use(restify.bodyParser());
 server.use(restify.queryParser());
 
+// READ Users
 // if root url is requested (an event), run this callback function in nodejs
 // ... 'get' is initiated and completes the function code 
 server.get("/", function(req, res, next) {
@@ -22,6 +23,7 @@ server.get("/", function(req, res, next) {
   return next();
 });
 
+// READ User
 // fetch info about a particular user
 server.get("/user/:id", function(req, res, next) {
   res.setHeader('content-type', 'application/json');
@@ -31,6 +33,7 @@ server.get("/user/:id", function(req, res, next) {
   return next();
 });
 
+// CREATE User
 // take request object, etc..
 // if a 'post' occurs to the /user url endpoint, then execute this code
 server.post("/user", function(req, res, next) {
@@ -44,6 +47,22 @@ server.post("/user", function(req, res, next) {
   res.setHeader('content-type', 'application/json');
   res.writeHead(200);
   // respond with json string consisting of info related to this user
+  res.end(JSON.stringify(user));
+  return next();
+});
+
+// UPDATE User
+// if a 'put' to /user/id url
+server.put("/user/:id", function(req, res, next) {
+  // user by user ID
+  var user = users[parseInt(req.params.id)];
+  var updates = req.params;
+  for (var field in updates) {
+    user[field] = updates[field];
+  }
+
+  res.setHeader('content-type', 'application/json');
+  res.writeHead(200);
   res.end(JSON.stringify(user));
   return next();
 });
