@@ -7,7 +7,7 @@ var max_user_id = 0;
 server.use(restify.acceptParser(server.acceptable));
 server.use(restify.bodyParser());
 
-// if root url is requested (that's an event), run this callback function in nodejs
+// if root url is requested (an event), run this callback function in nodejs
 // ... 'get' is initiated and completes the function code 
 server.get("/", function(req, res, next) {
   // tell client that it can expect json to be returned
@@ -26,11 +26,14 @@ server.post("/user", function(req, res, next) {
   // in our http request, the parameters are going to define our new user
   var user = req.params;
   max_user_id++; // increment the max_user_id
-  user.id = max_user_id; // id of new user is whatever the current max_user_id is (incremented) 
-  users[user.id] = user; // user array, which consits of all users, the key is "user.id" and the data is from "user" (var = user)
+  user.id = max_user_id; // id of new user is current max_user_id (incremented) 
+  /* user array, which consits of all users, the key is "user.id" and 
+   * the data is from "user" (var = user) */
+  users[user.id] = user;
   res.setHeader('content-type', 'application/json');
   res.writeHead(200);
-  res.end(JSON.stringify(user)); // respond with json string consisting of info related to this user
+  // respond with json string consisting of info related to this user
+  res.end(JSON.stringify(user));
   return next();
 });
 
