@@ -7,6 +7,7 @@ var max_user_id = 0;
 server.use(restify.acceptParser(server.acceptable));
 // handles parsing individual parameters of code to be posted and requested
 server.use(restify.bodyParser());
+server.use(restify.queryParser());
 
 // if root url is requested (an event), run this callback function in nodejs
 // ... 'get' is initiated and completes the function code 
@@ -18,6 +19,15 @@ server.get("/", function(req, res, next) {
   // send data back in the response body, a json response string
   res.end(JSON.stringify(users));
   // ensure no further execution takes place after function is executed
+  return next();
+});
+
+// fetch info about a particular user
+server.get("/user/:id", function(req, res, next) {
+  res.setHeader('content-type', 'application/json');
+  res.writeHead(200);
+  // req.params.id is going to store what we have coming in from the url
+  res.end(JSON.stringify(users[parseInt(req.params.id)]));
   return next();
 });
 
