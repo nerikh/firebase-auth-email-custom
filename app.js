@@ -5,6 +5,7 @@ var users = {  };
 var max_user_id = 0;
 
 server.use(restify.acceptParser(server.acceptable));
+// handles parsing individual parameters of code to be posted and requested
 server.use(restify.bodyParser());
 
 // if root url is requested (an event), run this callback function in nodejs
