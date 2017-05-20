@@ -23,6 +23,7 @@ module.exports = function(server) {
     req.assert('id', 'Id is required and must be numeric').notEmpty().isInt();
     var errors = req.validationErrors();
     if (errors) {
+      // errors[0] will output only the first error (in the array)
       helpers.failure(res, next, errors[0], 400);
     }
     // End Validation
@@ -37,6 +38,17 @@ module.exports = function(server) {
   // take request object, etc..
   // if a 'post' occurs to the /user url endpoint, then execute this code
   server.post("/user", function(req, res, next) {
+    // Validation: restify-validator
+    req.assert('first_name', 'First name is required').notEmpty();
+    req.assert('last_name', 'Last name is required').notEmpty();
+    req.assert('email_address', 'Email address is required and must be a valid email').notEmpty().isEmail();
+    req.assert('career', 'Carrer must be either a student, teacher, or professor').isIn(['student', 'teacher', 'professor']);
+    var errors = req.validationErrors();
+    if (errors) {
+      // errors will output all errors in the array
+      helpers.failure(res, next, errors, 400);
+    }
+    // End Validation
     // in our http request, the parameters are going to define our new user
     var user = req.params;
     max_user_id++; // increment the max_user_id
@@ -50,6 +62,14 @@ module.exports = function(server) {
   // UPDATE User
   // if a 'put' to /user/id url
   server.put("/user/:id", function(req, res, next) {
+    // Validation: restify-validator
+    req.assert('id', 'Id is required and must be numeric').notEmpty().isInt();
+    var errors = req.validationErrors();
+    if (errors) {
+      // errors[0] will output only the first error (in the array)
+      helpers.failure(res, next, errors[0], 400);
+    }
+    // End Validation
     if (typeof(users[req.params.id]) === 'undefined') {
       helpers.failure(res, next, 'The specified user could not be found in the database', 404);
     }
@@ -63,6 +83,13 @@ module.exports = function(server) {
 
   // DELETE User
   server.del("/user/:id", function(req, res, next) {
+    // Validation: restify-validator
+    req.assert('id', 'Id is required and must be numeric').notEmpty().isInt();
+    var errors = req.validationErrors();
+    if (errors) {
+      // errors[0] will output only the first error (in the array)
+      helpers.failure(res, next, errors[0], 400);
+    }
     if (typeof(users[req.params.id]) === 'undefined') {
       helpers.failure(res, next, 'The specified user could not be found in the database', 404);
     }
