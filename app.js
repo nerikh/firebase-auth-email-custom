@@ -52,12 +52,19 @@ server.get("/", function(req, res, next) {
 // READ User
 // fetch info about a particular user
 server.get("/user/:id", function(req, res, next) {
-   success(res, next, users[parseInt(req.params.id)]);
+  // Error handling
+  if (typeof(users[req.params.id]) === 'undefined') {
+    failure(res, next, 'The specified user could not be found in the database', 404);
+  }
+  success(res, next, users[parseInt(req.params.id)]);
 });
 
 // UPDATE User
 // if a 'put' to /user/id url
 server.put("/user/:id", function(req, res, next) {
+  if (typeof(users[req.params.id]) === 'undefined') {
+    failure(res, next, 'The specified user could not be found in the database', 404);
+  }
   var user = users[parseInt(req.params.id)];
   var updates = req.params;
   for (var field in updates) {
@@ -68,6 +75,9 @@ server.put("/user/:id", function(req, res, next) {
 
 // DELETE User
 server.del("/user/:id", function(req, res, next) {
+  if (typeof(users[req.params.id]) === 'undefined') {
+    failure(res, next, 'The specified user could not be found in the database', 404);
+  }
   delete users[parseInt(req.params.id)];
   success(res, next, []);
 });
