@@ -54,7 +54,6 @@ server.post("/user", function(req, res, next) {
 // UPDATE User
 // if a 'put' to /user/id url
 server.put("/user/:id", function(req, res, next) {
-  // user by user ID
   var user = users[parseInt(req.params.id)];
   var updates = req.params;
   for (var field in updates) {
@@ -66,6 +65,7 @@ server.put("/user/:id", function(req, res, next) {
   res.end(JSON.stringify(user));
   return next();
 });
+
 
 server.listen(8080, function() {
   console.log('%s listening at %s', server.name, server.url);
