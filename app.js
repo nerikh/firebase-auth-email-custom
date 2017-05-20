@@ -1,3 +1,22 @@
+function respond(res, next, status, data, http_code) {
+  var response = {
+    'status': status,
+    'data': data
+  };
+  res.setHeader('content-type', 'application/json');
+  res.writeHead(http_code);
+  res.end(JSON.stringify(response));
+  return next();
+}
+// if api call successful
+function success(res, next, data) {
+  respond(res, next, 'success', data, 200);
+}
+// if api call fails
+function failure(res, next, data, http_code) {
+  respond(res, next, 'failure', data, http_code);
+}
+
 var restify = require('restify');
 var server = restify.createServer();
 
@@ -16,39 +35,24 @@ server.post("/user", function(req, res, next) {
   // in our http request, the parameters are going to define our new user
   var user = req.params;
   max_user_id++; // increment the max_user_id
-  user.id = max_user_id; // id of new user is current max_user_id (incremented) 
+  user.id = max_user_id; // id of new user is current max_user_id (incremented)
   /* user array, which consits of all users, the key is "user.id" and 
    * the data is from "user" (var = user) */
   users[user.id] = user;
-  res.setHeader('content-type', 'application/json');
-  res.writeHead(200);
-  // respond with json string consisting of info related to this user
-  res.end(JSON.stringify(user));
-  return next();
+  success(res, next, user);
 });
 
 // READ Users
 // if root url is requested (an event), run this callback function in nodejs
 // ... 'get' is initiated and completes the function code 
 server.get("/", function(req, res, next) {
-  // tell client that it can expect json to be returned
-  res.setHeader('content-type', 'application/json');
-  // return the header to the client
-  res.writeHead(200);
-  // send data back in the response body, a json response string
-  res.end(JSON.stringify(users));
-  // ensure no further execution takes place after function is executed
-  return next();
+  success(res, next, users);
 });
 
 // READ User
 // fetch info about a particular user
 server.get("/user/:id", function(req, res, next) {
-  res.setHeader('content-type', 'application/json');
-  res.writeHead(200);
-  // req.params.id is going to store what we have coming in from the url
-  res.end(JSON.stringify(users[parseInt(req.params.id)]));
-  return next();
+   success(res, next, users[parseInt(req.params.id)]);
 });
 
 // UPDATE User
@@ -59,21 +63,13 @@ server.put("/user/:id", function(req, res, next) {
   for (var field in updates) {
     user[field] = updates[field];
   }
-
-  res.setHeader('content-type', 'application/json');
-  res.writeHead(200);
-  res.end(JSON.stringify(user));
-  return next();
+ success(res, next, user); 
 });
 
 // DELETE User
 server.del("/user/:id", function(req, res, next) {
   delete users[parseInt(req.params.id)];
-  res.setHeader('content-type', 'application/json');
-  res.writeHead(200);
-  // respond true if user was deleted
-  res.end(JSON.stringify(true));
-  return next();
+  success(res, next, []);
 });
 
 server.listen(8080, function() {
