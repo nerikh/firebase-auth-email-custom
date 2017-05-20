@@ -2,8 +2,10 @@ var restify = require('restify');
 var server = restify.createServer();
 var setupController = require('./controllers/setupController.js');
 var userController = require('./controllers/userController.js');
+var restifyValidator = require('restify-validator');
 
-setupController(server, restify);
+
+setupController(server, restify, restifyValidator);
 userController(server);
 
 server.listen(8080, function() {

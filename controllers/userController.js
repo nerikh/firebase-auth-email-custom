@@ -19,6 +19,13 @@ module.exports = function(server) {
   // READ User
   // fetch info about a particular user
   server.get("/user/:id", function(req, res, next) {
+    // Validation: restify-validator
+    req.assert('id', 'Id is required and must be numeric').notEmpty().isInt();
+    var errors = req.validationErrors();
+    if (errors) {
+      helpers.failure(res, next, errors[0], 400);
+    }
+    // End Validation
     // Error handling
     if (typeof(users[req.params.id]) === 'undefined') {
       helpers.failure(res, next, 'The specified user could not be found in the database', 404);
