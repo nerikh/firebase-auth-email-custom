@@ -5,36 +5,48 @@ var helpers = require('../config/helperFunctions.js');
 
 // DB include Users Model to make DB model (collections + documents) available
 var UserModel = require('../models/UserModel');
-/*
-// Fake database
-var users = {  };
-var max_user_id = 0;
-*/
+
 // Functions
 module.exports = function(server) {
   // READ Users
   // if root url is requested (an event), run this callback function in nodejs
   // ... 'get' is initiated and completes the function code 
   server.get("/", function(req, res, next) {
-    helpers.success(res, next, users);
+    // find{} will find all, it like the "where" clause in SQL
+    UserModel.find({}, function (err, users) {
+			// docs.forEach 
+      helpers.success(res, next, users);
+    });
   });
 
   // READ User
   // fetch info about a particular user
   server.get("/user/:id", function(req, res, next) {
     // Validation: restify-validator
-    req.assert('id', 'Id is required and must be numeric').notEmpty().isInt();
+    req.assert('id', 'Id is required and must be numeric').notEmpty();
     var errors = req.validationErrors();
     if (errors) {
       // errors[0] will output only the first error (in the array)
       helpers.failure(res, next, errors[0], 400);
     }
     // End Validation
-    // Error handling
+    // Find user: findOne{..} will find a single record, it like the "where" clause in SQL
+    UserModel.findOne({ _id: req.params.id }, function (err, user) {
+      // Error handling
+      if (err) {
+        helpers.failure(res, next, 'Something went wrong while fetching the user form the database', 500);
+      }
+      if (user === null) {
+        helpers.failure(res, next, 'The specified user could not be found', 404);
+      }
+      helpers.success(res, next, user);
+    });
+    /* For fake db: No longer necessary connecting to Mongo
     if (typeof(users[req.params.id]) === 'undefined') {
       helpers.failure(res, next, 'The specified user could not be found in the database', 404);
     }
     helpers.success(res, next, users[parseInt(req.params.id)]);
+    */
   });
 
   // CREATE User
@@ -79,37 +91,77 @@ module.exports = function(server) {
   // if a 'put' to /user/id url
   server.put("/user/:id", function(req, res, next) {
     // Validation: restify-validator
-    req.assert('id', 'Id is required and must be numeric').notEmpty().isInt();
+    req.assert('id', 'Id is required and must be numeric').notEmpty();
     var errors = req.validationErrors();
     if (errors) {
       // errors[0] will output only the first error (in the array)
       helpers.failure(res, next, errors[0], 400);
     }
+    // DB Find user: findOne{..} will find a single record, it like the "where" clause in SQL
+    UserModel.findOne({ _id: req.params.id }, function (err, user) {
+      // Error handling
+      if (err) {
+        helpers.failure(res, next, 'Something went wrong while fetching the user form the database', 500);
+      }
+      if (user === null) {
+        helpers.failure(res, next, 'The specified user could not be found', 404);
+      }
+      var updates = req.params;
+      delete updates.id;
+      for (var field in updates) {
+        user[field] = updates[field];
+      }
+      // Mongoose user.save
+      user.save(function (err) {
+        helpers.failure(res, next, 'Error saving user to database');
+      });
+      helpers.success(res, next, user); 
+    });
+    /*
     // End Validation
     if (typeof(users[req.params.id]) === 'undefined') {
       helpers.failure(res, next, 'The specified user could not be found in the database', 404);
     }
     var user = users[parseInt(req.params.id)];
-    var updates = req.params;
-    for (var field in updates) {
-      user[field] = updates[field];
-    }
-    helpers.success(res, next, user); 
+    */
+    ///////////
   });
 
   // DELETE User
   server.del("/user/:id", function(req, res, next) {
     // Validation: restify-validator
-    req.assert('id', 'Id is required and must be numeric').notEmpty().isInt();
+    req.assert('id', 'Id is required and must be numeric').notEmpty();
     var errors = req.validationErrors();
     if (errors) {
       // errors[0] will output only the first error (in the array)
       helpers.failure(res, next, errors[0], 400);
     }
-    if (typeof(users[req.params.id]) === 'undefined') {
+    // DB Find user: findOne{..} will find a single record, it like the "where" clause in SQL
+    UserModel.findOne({ _id: req.params.id }, function (err, user) {
+      // Error handling
+      if (err) {
+        helpers.failure(res, next, 'Something went wrong while fetching the user form the database', 500);
+      }
+      if (user === null) {
+        helpers.failure(res, next, 'The specified user could not be found', 404);
+      }
+      // Mongoose user.remove
+      user.remove(function (err) {
+        helpers.failure(res, next, 'Error removing user from the database');
+      });
+      helpers.success(res, next, user); 
+    });
+    /* no longer needed 
+      var updates = req.params;
+      delete updates.id;
+      for (var field in updates) {
+        user[field] = updates[field];
+      }
+       if (typeof(users[req.params.id]) === 'undefined') {
       helpers.failure(res, next, 'The specified user could not be found in the database', 404);
     }
     delete users[parseInt(req.params.id)];
     helpers.success(res, next, []);
+    */
   });
 }
