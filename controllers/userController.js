@@ -1,12 +1,15 @@
 
 // Import the success and failure functions from helperFunctions
-// add 'helpers.' everywhere in this file where you want to use the helperFunctions 
+// add 'helpers.' everywhere in this file where want to use the helperFunctions 
 var helpers = require('../config/helperFunctions.js');
 
+// DB include Users Model to make DB model (collections + documents) available
+var UserModel = require('../models/UserModel');
+/*
 // Fake database
 var users = {  };
 var max_user_id = 0;
-
+*/
 // Functions
 module.exports = function(server) {
   // READ Users
@@ -50,12 +53,25 @@ module.exports = function(server) {
     }
     // End Validation
     // in our http request, the parameters are going to define our new user
+    /* Following code no longer needed when using real Database Connection
     var user = req.params;
     max_user_id++; // increment the max_user_id
     user.id = max_user_id; // id of new user is current max_user_id (incremented)
     // user array, which consits of all users, the key is "user.id" and 
     // the data is from "user" (var = user) 
     users[user.id] = user;
+    */
+    // DB UserModel: instantiate the UserModel
+    var user = new UserModel();
+    user.first_name = req.params.first_name;
+    user.last_name = req.params.last_name;
+    user.email_address = req.params.email_address;
+    user.career = req.params.career;
+    // Mongoose user.save
+    user.save(function (err) {
+      helpers.failure(res, next, 'Error saving user to database');
+    });
+    // End Mongoose
     helpers.success(res, next, user);
   });
 
