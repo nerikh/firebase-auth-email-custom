@@ -1,12 +1,12 @@
 (function() {
 // Initialize Firebase
     var config = {
-      apiKey: "AIzaSyD3rPxwJ6itkNklg1zoyxrPeoSFgdNDbI0",
-      authDomain: "testme-b1756.firebaseapp.com",
-      databaseURL: "https://testme-b1756.firebaseio.com",
-      projectId: "testme-b1756",
-      storageBucket: "testme-b1756.appspot.com",
-      messagingSenderId: "631824635923"
+    apiKey: "AIzaSyBKAe_FpRGNoCAqWf5fsbEmIzVTIfb65J0",
+    authDomain: "fir-auth-4c01a.firebaseapp.com",
+    databaseURL: "https://fir-auth-4c01a.firebaseio.com",
+    projectId: "fir-auth-4c01a",
+    storageBucket: "fir-auth-4c01a.appspot.com",
+    messagingSenderId: "418955770967"
     };
     firebase.initializeApp(config);
 
@@ -16,7 +16,7 @@
   const btnLogin = document.getElementById('btnLogin');
   const btnSignUp = document.getElementById('btnSignUp');
   const btnLogout = document.getElementById('btnLogout');
-
+  console.log(txtEmail, txtPassword);
   // Add login event
   btnLogin.addEventListener('click', e => {
     //Get email adn pass
@@ -51,4 +51,3 @@
   });
 */
 }());
-
